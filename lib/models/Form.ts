@@ -11,8 +11,8 @@ export interface Form extends Document {
 }
 
 const FormSchema = new Schema<Form>({
-  title: { type: String, required: true },
-  description: { type: String },
+  title: String,
+  description: String,
   questions: {
     type: [
       {
