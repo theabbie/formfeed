@@ -82,7 +82,7 @@ export default function PreviewPage({ params }: { params: Promise<{ formId: stri
                                 {renderQuestionInput(question)}
                             </div>
                         ))}
-                        <Button btnType="primary" type="submit" onClick={console.log}>
+                        <Button btnType="primary" type="submit" onClick={() => alert("Form Successfully Submitted (jk didn't add this functionality)")}>
                             Submit
                         </Button>
                     </form>
