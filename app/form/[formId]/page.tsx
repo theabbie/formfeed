@@ -11,13 +11,13 @@ import { ReactSortable } from 'react-sortablejs';
 import { useState, useEffect, use } from 'react';
 import Dropdown from '@/app/components/Dropdown';
 import ExpandIcon from '@/app/components/icons/expand';
+import SingleSelect from '@/app/components/SingleSelect';
 
 export default function FormPage({ params }: { params: Promise<{ formId: string }> }) {
     const { formId } = use(params);
     const [form, setForm] = useState<any>(null);
     const [title, setTitle] = useState<string>('');
     const [newQuestions, setNewQuestions] = useState<any[]>([]);
-    const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchForm = async () => {
@@ -35,6 +35,30 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
         fetchForm();
     }, [formId]);
 
+    const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(event.target.value);
+    };
+
+    const handleQuestionChange = (index: number, newText: string) => {
+        const updatedQuestions = [...newQuestions];
+        updatedQuestions[index].text = newText;
+        setNewQuestions(updatedQuestions);
+    };
+
+    const handleTypeChange = (index: number, newType: string) => {
+        const updatedQuestions = [...newQuestions];
+        updatedQuestions[index].type = newType;
+        setNewQuestions(updatedQuestions);
+    };
+
+    const handleAddQuestion = (type: string) => {
+        const newQuestion = {
+            text: '',
+            type
+        };
+        setNewQuestions([...newQuestions, newQuestion]);
+    };
+
     const handleFormUpdate = async () => {
         const response = await fetch(`/api/form/${formId}`, {
             method: 'PUT',
@@ -50,11 +74,7 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
         }
     };
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-
-    const Question = ({ question, index }: { question: { text: string; type: string }, index: number }) => {
+    const Question = ({ question, index }: { question: { text: string; type: string, options?: string[] }, index: number }) => {
         const renderInput = () => {
             switch (question.type) {
                 case 'Short Answer':
@@ -73,10 +93,14 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
                     );
                 case 'Single Select':
                     return (
-                        <select>
-                            <option value="option1">Option 1</option>
-                            <option value="option2">Option 2</option>
-                        </select>
+                        <SingleSelect
+                            options={question.options || []}
+                            onChange={(updatedOptions) => {
+                                const updatedQuestions = [...newQuestions];
+                                updatedQuestions[index].options = updatedOptions;
+                                setNewQuestions(updatedQuestions);
+                            }}
+                        />
                     );
                 case 'URL':
                     return (
@@ -105,12 +129,13 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
                             type="title"
                             placeholder="Write a Question"
                             defaultValue={question.text}
+                            onBlur={(e) => handleQuestionChange(index, e.target.value)}
                         />
                     </div>
                     <Dropdown
                         options={['Short Answer', 'Long Answer', 'Single Select', 'Number', 'URL', 'Date']}
                         selected={question.type}
-                        onSelect={console.log}
+                        onSelect={(newType) => handleTypeChange(index, newType)}
                         button={<ExpandIcon />}
                     />
                     <div className="cursor-pointer">
@@ -125,7 +150,20 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
     };
 
     if (!form) {
-        return <div>Loading...</div>;
+        return (
+            <div
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    fontSize: '1.5rem',
+                    fontWeight: 'bold',
+                }}
+            >
+                Loading...
+            </div>
+        );
     }
 
     return (
@@ -133,8 +171,8 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
             <div className="w-full md:max-w-[44%] md:min-w-[320px] h-screen border border-[#E1E4E8] bg-white flex flex-col">
                 <header className="bg-white border-b border-gray-300 py-2">
                     <div className="flex items-center justify-between px-4">
-                        <Input placeholder='Untitled Form' type="title" defaultValue={form.title} />
-                        <Button btnType="secondary" onClick={console.log}>Preview <PreviewIcon /></Button>
+                        <Input placeholder='Untitled Form' type="title" defaultValue={form.title} onChange={handleTitleChange} />
+                        <Button btnType="secondary" onClick={() => { window.open(`/form/${formId}/preview`, '_blank') }}>Preview <PreviewIcon /></Button>
                     </div>
                 </header>
 
@@ -146,15 +184,13 @@ export default function FormPage({ params }: { params: Promise<{ formId: string 
                             </div>
                         ))}
                     </>
-                    <div className='flex flex-col align-middle'>
-                        <div className="flex justify-center">
-                            <Dropdown
-                                options={['Short Answer', 'Long Answer', 'Single Select', 'Number', 'URL', 'Date']}
-                                selected={""}
-                                onSelect={console.log}
-                                button={<><AddIcon /> <span className='font-bold'>Add Question</span></>}
-                            />
-                        </div>
+                    <div className="flex justify-center my-3">
+                        <Dropdown
+                            options={['Short Answer', 'Long Answer', 'Single Select', 'Number', 'URL', 'Date']}
+                            selected={""}
+                            onSelect={handleAddQuestion}
+                            button={<><AddIcon /> <span className='font-bold'>Add Question</span></>}
+                        />
                     </div>
                 </main>
 
