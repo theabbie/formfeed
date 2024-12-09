@@ -30,7 +30,8 @@ const Button: React.FC<ButtonProps> = ({ btnType, onClick, children, disabled, .
     <button
       onClick={handleClick}
       disabled={isLoading || disabled}
-      className={`rounded-[12px] pl-[14px] pr-[16px] py-[6px] ${buttonStyles} disabled:opacity-50 disabled:cursor-not-allowed`}
+      className={`rounded-[12px] pl-[14px] pr-[16px] py-[6px] ${buttonStyles} disabled:opacity-50 disabled:cursor-not-allowed flex`}
+      style={{ alignItems: "center" }}
       {...props}
     >
       {children}

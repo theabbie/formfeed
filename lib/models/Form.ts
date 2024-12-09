@@ -4,8 +4,9 @@ export interface Form extends Document {
   title: string;
   description?: string;
   questions: {
-    type: 'Short Answer' | 'Long Answer' | 'Single Select' | 'Number' | 'URL';
+    type: 'Short Answer' | 'Long Answer' | 'Single Select' | 'Number' | 'URL' | 'Date';
     text: string;
+    subtext?: string;
     options?: string[];
   }[];
 }
@@ -16,8 +17,9 @@ const FormSchema = new Schema<Form>({
   questions: {
     type: [
       {
-        type: { type: String, enum: ['Short Answer', 'Long Answer', 'Single Select', 'Number', 'URL'], required: true },
+        type: { type: String, enum: ['Short Answer', 'Long Answer', 'Single Select', 'Number', 'URL', 'Date'], required: true },
         text: { type: String, required: true },
+        subtext: { type: String, default: '' },
         options: { type: [String], default: [] },
       },
     ],

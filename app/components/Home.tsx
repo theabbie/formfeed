@@ -13,7 +13,7 @@ export default function Home() {
         axios<{ success: Boolean, form: { _id: String } }>({
             url: "/api/create",
             method: "POST",
-            data: { title: "Untitled Form", description: "" }
+            data: { title: "", description: "" }
         }).then((response) => {
             if (response.data.success) {
                 router.push("/form/" + response.data.form._id);

@@ -7,6 +7,7 @@ const DragIcon = () => (
     height="24"
     fill="none"
     viewBox="0 0 24 24"
+    className="mx-2"
   >
     <path
       stroke="#0D0D0D"
