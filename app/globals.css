@@ -5,3 +5,10 @@
 html {
   color-scheme: light;
 }
+
+input:focus,
+textarea:focus,
+select:focus,
+button:focus {
+  outline: none;
+}
